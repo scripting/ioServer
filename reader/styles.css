@@ -1,0 +1,108 @@
+body {
+	font-family: Ubuntu;
+	font-size: 18px;
+	background-color: whitesmoke;
+	}
+.divPageBody {
+	width: 60%;
+	margin-top: 30px;
+	margin-left: auto;
+	margin-right: auto;
+	}
+.divOutliner {
+	padding: 4px;
+	min-height: 400px;
+	min-width: 600px;
+	width: 100%;
+	border: 1px solid gainsboro;
+	background-color: white;
+	}
+.leftSidebar {
+	border-right-width: 1px;
+	border-right-style: solid;
+	left: 0;
+	padding: 0 6px 6px 6px;
+	position: fixed;
+	top: 0;
+	border-right-color: gainsboro; 
+	height: 100%;
+	}
+.divIcons {
+	width: 24px;
+	display: table-cell;
+	vertical-align: top;
+	}
+.divOutlineContainer {
+	display: table-cell;
+	vertical-align: top;
+	}
+.divIcon {
+	padding-bottom: 35px;
+	}
+.divIcon i {
+	font-size: 24px;
+	color: silver; 
+	}
+.divHeader {
+	margin-left: 24px;
+	line-height: 200%;
+	margin-bottom: 25px;
+	}
+.divTitle {
+	font-family: "Oswald";
+	font-size: 48px;
+	font-weight: bold;
+	line-height: 120%;
+	}
+.divDescription {
+	font-size: 20px;
+	}
+.divByLine {
+	font-size: 20px;
+	line-height: 120%;
+	}
+
+.divHeaderSmall {
+	font-family: "Ubuntu";
+	font-size: 18px;
+	line-height: 140%;
+	padding: 10px;
+	background-color: white;
+	border-bottom: 1px solid silver;
+	}
+.divTitleSmall {
+	font-weight: bold;
+	}
+.divByLineSmall {
+	float: right;
+	font-size: 16px;
+	}
+.divTitleSmall a {
+	color: black;
+	}
+
+/* styles for phone, tablet */
+	@media only screen 
+	and (min-device-width : 320px) 
+	and (max-device-width : 1024px) {
+		.divPageBody {
+			width: 98%;
+			margin-left: auto;
+			margin-right: auto;
+			margin-top: 0px;
+			}
+		.divOutliner {
+			min-width: 100px;
+			}
+		.divByLineSmall {
+			float: none;
+			}
+		.divTitleSmall {
+			display: none;
+			font-weight: normal;
+			}
+		.divIcons {
+			display: none;
+			}
+		
+		}

@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<title></title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script src="//s3.amazonaws.com/scripting.com/code/includes/jquery-1.9.1.min.js"></script>
+<link href="//s3.amazonaws.com/scripting.com/code/includes/bootstrap.css" rel="stylesheet">
+<script src="//s3.amazonaws.com/scripting.com/code/includes/bootstrap.min.js"></script>
+
+<link rel="stylesheet" href="//s3.amazonaws.com/scripting.com/code/fontawesome/css/all.css">
+<link href="//fonts.googleapis.com/css?family=Ubuntu:400,500i,700" rel="stylesheet">
+<link href="//fonts.googleapis.com/css?family=Rancho" rel="stylesheet">
+
+<script src="//s3.amazonaws.com/scripting.com/code/includes/basic/code.js"></script>
+<link href="//s3.amazonaws.com/scripting.com/code/includes/basic/styles.css" rel="stylesheet" type="text/css">
+
+		<script src="http://fargo.io/code/concord.js"></script>
+		<script src="http://fargo.io/code/concordKeyboard.js" /></script>
+		<script src="http://fargo.io/code/shared/outliner.js"></script>
+		<script src="http://fargo.io/code/shared/xml.js"></script>
+		<script src="http://fargo.io/code/storage/api.js"></script>
+		<link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet' type='text/css'>
+		<script src="http://scripting.com/code/ioreader/code.js"></script>
+		<link href="http://scripting.com/code/ioreader/styles.css" rel="stylesheet" type="text/css">
+		<script>
+			var theOutline = {
+				url: "[%url%]"
+				};
+			</script>
+		</head>
+	<body>
+		<div class="divHeaderSmall">
+			<div class="divByLineSmall" id="idByLine">
+				&nbsp;
+				</div>
+			<div class="divTitleSmall" id="idTitle">
+				&nbsp;
+				</div>
+			</div>
+		<div class="divPageBody">
+			<div class="divIcons">
+				<div class="divIcon">
+					<a href="#" id="idLinkToLockIcon" onclick="toggleLocked ();">
+						<span id="idLockIcon"></span>
+						</a>
+					</div>
+				</div>
+			<div class="divOutlineContainer">
+				<div class="divOutliner" id="outliner">
+					</div>
+				</div>
+			</div>
+		<script>
+			$(document).ready (function () {
+				startup ();
+				});
+			</script>
+		</body>
+	</html>
