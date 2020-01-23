@@ -1,4 +1,4 @@
-var myVersion = "0.5.0", myProductName = "ioServer"; 
+var myVersion = "0.5.1", myProductName = "ioServer"; 
 
 const fs = require ("fs");
 const request = require ("request");
@@ -8,6 +8,7 @@ const utils = require ("daveutils");
 var config = {
 	port: 1240,
 	flLogToConsole: true,
+	flAllowAccessFromAnywhere: true, 
 	rootDomain: "instantoutliner.com",
 	createPath: undefined, //the path you use to create a new short URL, must be specified in config.json
 	urlOutlineTemplate: "http://scripting.com/code/ioreader/index.html",
@@ -26,7 +27,7 @@ var stats = {
 	ctHitsThisRun:0, 
 	whenLastHit: new Date (0),
 	
-	nextString: 0,
+	nextstring: 0,
 	outlineMap: {}
 	};
 const fnameStats = "stats.json";
@@ -71,6 +72,14 @@ function handleHttpRequest (theRequest) {
 			}
 		else {
 			returnData (jstruct);
+			}
+		}
+	function httpReturnString (err, s) {
+		if (err) {
+			returnError (err);
+			}
+		else {
+			returnPlainText (s);
 			}
 		}
 	function returnUrlContents (url, pagetable, callback) {
@@ -123,6 +132,7 @@ function handleHttpRequest (theRequest) {
 					description,
 					socketserver
 					};
+				console.log ("createOutlinePage: jstruct == " + utils.jsonStringify (jstruct));
 				stats.outlineMap [thisString] = jstruct;
 				stats.nextstring = utils.bumpUrlString (thisString);
 				statsChanged ();
@@ -164,7 +174,7 @@ function handleHttpRequest (theRequest) {
 				callback ({message: "Can't create the short url because the \"url \"parameter is not provided."});
 				}
 			else {
-				createOutlinePage (params.url, params.title, params.description, params.socketserver, httpReturn);
+				createOutlinePage (params.url, params.title, params.description, params.socketserver, httpReturnString);
 				}
 			break;
 		default:
@@ -219,14 +229,14 @@ function everyMinute () {
 	if (now.getMinutes () == 0) {
 		console.log ("\n" + myProductName + ": " + now.toLocaleTimeString () + ", v" + myVersion + ", " + stats.ctHitsThisRun + " hits");
 		}
+	}
+function everySecond () {
 	if (flStatsChanged) {
 		flStatsChanged = false;
 		stats.ctWrites++;
 		fs.writeFile (fnameStats, utils.jsonStringify (stats), function (err) {
 			});
 		}
-	}
-function everySecond () {
 	}
 
 readStats (function () {
@@ -235,8 +245,7 @@ readStats (function () {
 	stats.whenLastStart = new Date ();
 	statsChanged ();
 	readConfig (function () {
-		console.log ("\n" + myProductName + " v" + myVersion + " running on port " + config.myPort + ".\n");
-		console.log ("config == " + utils.jsonStringify (config));
+		console.log ("\n" + myProductName + " v" + myVersion + " running on port " + config.port + ".\n");
 		davehttp.start (config, handleHttpRequest);
 		setInterval (everySecond, 1000); 
 		setInterval (everyMinute, 60000); 

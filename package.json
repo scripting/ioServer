@@ -2,7 +2,7 @@
 	"name": "ioServer",
 	"description": "Server side of the instant outline reader.",
 	"author": "Dave Winer <dave@smallpicture.com>",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"scripts": {
 		"start": "node glue.js"
 		},
