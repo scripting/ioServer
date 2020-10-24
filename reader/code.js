@@ -111,7 +111,12 @@ function everySecond () {
 	}
 function startup () {
 	console.log ("startup");
+	
+	var itemparam = getURLParameter ("item");
+	console.log ("startup: itemparam == " + itemparam);
+	
 	readHttpFile (theOutline.url, function (opmltext) {
+		console.log ("startup: opmltext == " + opmltext);
 		opInitOutliner (opmltext, true);
 		opVisitAll (function (headline) {
 			var s = headline.getLineText ();
