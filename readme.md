@@ -14,6 +14,8 @@ I started taking notes here on 9/30/2020.
 
 The map is going in a MySQL database.
 
+Drummer will be able to open subscribable outlines directly, so it won't need this service. 
+
 9/30/20; 11:55:10 AM by DW
 
 The outline map, that associates an instant outline url with an outline, is in the stats struct. 
