@@ -2,13 +2,14 @@
 	"name": "ioServer",
 	"description": "Server side of the instant outline reader.",
 	"author": "Dave Winer <dave@smallpicture.com>",
-	"version": "0.5.5",
+	"version": "0.6.0",
 	"scripts": {
 		"start": "node glue.js"
 		},
 	"dependencies" : {
 		"request": "*",
 		"daveutils": "*",
+		"davesql": "*",
 		"opmltojs": "*",
 		"davehttp": "*"
 		}, 

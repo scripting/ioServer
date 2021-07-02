@@ -1,10 +1,11 @@
-var myVersion = "0.5.5", myProductName = "ioServer"; 
+var myVersion = "0.6.0", myProductName = "ioServer"; 
 
 const fs = require ("fs");
 const request = require ("request");
-const davehttp = require ("davehttp"); 
-const opmlToJs = require ("opmltojs");
 const utils = require ("daveutils"); 
+const opmlToJs = require ("opmltojs");
+const davehttp = require ("davehttp"); 
+const davesql = require ("davesql");
 
 var config = {
 	port: 1240,
@@ -28,7 +29,7 @@ var stats = {
 	ctHitsThisRun:0, 
 	whenLastHit: new Date (0),
 	
-	nextstring: 0
+	nextstring: "0"
 	};
 const fnameStats = "stats.json";
 var flStatsChanged = false;
@@ -38,7 +39,66 @@ const fnameOutlinemap = "map.json";
 var flOutlineMapChanged = false;
 
 
-
+function populateDatabase () { //6/25/21 by DW
+	let ctlinks = 0;
+	for (var x in outlineMap) {
+		let item = outlineMap [x];
+		let theLink = {
+			id: x,
+			url: item.url,
+			ct: item.ct,
+			whenCreated: new Date (item.when),
+			title: item.title,
+			socketserver: item.socketserver,
+			description: item.description
+			}
+		let sqltext = "replace into links " + davesql.encodeValues (theLink);
+		davesql.queueQuery (sqltext, function (err, result) {
+			if (err) {
+				console.log (err.message);
+				}
+			else {
+				console.log (ctlinks++ + ": " + utils.jsonStringify (theLink));
+				}
+			});
+		}
+	}
+function findLinkInDatabase (theLink, callback) { //6/25/21 by DW
+	var sqltext = "select * from links where url = " + davesql.encode (theLink) + ";";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (result.length == 0) {
+				callback (undefined, undefined);
+				}
+			else {
+				callback (undefined, result [0]);
+				}
+			}
+		});
+	}
+function findInDatabase (id, callback) {
+	var sqltext = "select * from links where id = " + davesql.encode (id) + ";";
+	davesql.runSqltext (sqltext, function (err, result) {
+		if (err) {
+			callback (err);
+			}
+		else {
+			if (result.length == 0) {
+				callback (undefined, undefined);
+				}
+			else {
+				callback (undefined, result [0]);
+				}
+			}
+		});
+	}
+function addLinkToDatabase (theLink, callback) { //6/25/21 by DW
+	let sqltext = "replace into links " + davesql.encodeValues (theLink);
+	davesql.runSqltext (sqltext, callback);
+	}
 
 function statsChanged () {
 	flStatsChanged = true;
@@ -185,65 +245,57 @@ function handleHttpRequest (theRequest) {
 		returnUrlContents (config.urlServerHomePageSource, pagetable);
 		}
 	function createOutlinePage (urlOpml, title, description, socketserver, callback) {
-		function findInOutlineMap (longUrl, callback) {
-			for (var x in outlineMap) {
-				var item = outlineMap [x];
-				if (item.url == longUrl) {
-					callback (item, x);
-					return;
-					}
-				}
-			callback (undefined);
-			}
-		findInOutlineMap (urlOpml, function (item, key) {
-			if (item !== undefined) {
-				if (title !== undefined) {
-					item.title = title;
-					}
-				if (description !== undefined) {
-					item.description = description;
-					}
-				if (socketserver !== undefined) {
-					item.socketserver = socketserver;
-					}
-				statsChanged ();
-				callback (undefined, "http://" + config.rootDomain + "/" + key);
+		findLinkInDatabase (urlOpml, function (err, item) {
+			if (err) {
+				callback (err.message); 
 				}
 			else {
-				var thisString = stats.nextstring;
-				var jstruct = {
-					url: urlOpml,
-					ct: 0,
-					when: new Date (),
-					title,
-					description,
-					socketserver
-					};
-				console.log ("createOutlinePage: jstruct == " + utils.jsonStringify (jstruct));
-				outlineMap [thisString] = jstruct;
-				stats.nextstring = utils.bumpUrlString (thisString);
-				statsChanged ();
-				outlinemapChanged ();
-				callback (undefined, "http://" + config.rootDomain + "/" + thisString);
+				if (item === undefined) { //it's a new link
+					item = {
+						id: stats.nextstring,
+						url: urlOpml,
+						ct: 0,
+						whenCreated: new Date (),
+						title,
+						description,
+						socketserver
+						};
+					stats.nextstring = utils.bumpUrlString (stats.nextstring);
+					statsChanged ();
+					}
+				else {
+					if (title !== undefined) {
+						item.title = title;
+						}
+					if (description !== undefined) {
+						item.description = description;
+						}
+					if (socketserver !== undefined) {
+						item.socketserver = socketserver;
+						}
+					}
+				addLinkToDatabase (item);
+				callback (undefined, "http://" + config.rootDomain + "/" + item.id);
 				}
 			});
 		}
-	function returnOutlinePage (path, permalink, flReturnData) {
-		var path = utils.stringDelete (path, 1, 1);
-		var jstruct = outlineMap [path];
-		if (jstruct === undefined) {
-			return404 ();
-			}
-		else {
-			jstruct.ct++;
-			statsChanged ();
-			if (flReturnData) {
-				returnData (jstruct);
+	function returnOutlinePage (id, permalink, flReturnData) {
+		id = utils.stringDelete (id, 1, 1); //drop the / at the beginning
+		findInDatabase (id, function (err, item) {
+			if (err || (item == undefined)) {
+				return404 ();
 				}
 			else {
-				returnRedirect ("http://littleoutliner.com?url=http://instantoutliner.com/" + path); //9/30/20 by DW
+				if (flReturnData) {
+					returnData (item);
+					}
+				else {
+					returnRedirect ("http://littleoutliner.com?url=http://instantoutliner.com/" + id); //9/30/20 by DW
+					}
+				item.ct++;
+				addLinkToDatabase (item);
 				}
-			}
+			});
 		}
 	switch (theRequest.lowerpath) {
 		case "/":
@@ -361,9 +413,11 @@ readOutlinemap (function () {
 		statsChanged ();
 		readConfig (function () {
 			console.log ("\n" + myProductName + " v" + myVersion + " running on port " + config.port + ".\n");
-			davehttp.start (config, handleHttpRequest);
-			setInterval (everySecond, 1000); 
-			setInterval (everyMinute, 60000); 
+			davesql.start (config.database, function () { //6/25/21 by DW
+				davehttp.start (config, handleHttpRequest);
+				setInterval (everySecond, 1000); 
+				setInterval (everyMinute, 60000); 
+				});
 			});
 		});
 	});
